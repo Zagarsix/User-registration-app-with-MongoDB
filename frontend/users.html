@@ -1,23 +1,484 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de usuarios registrados</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #248111 0%, #112994 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .header {
+            padding: 40px;
+            text-align: center;
+            background: #f8f9fa;
+        }
+
+        .header h1 {
+            color: #235304;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #112994;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error {
+            text-align: center;
+            padding: 40px 20px;
+            color: #e74c3c;
+            background: #fdf2f2;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .error h3 {
+            margin-bottom: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .user-card {
+            background: white;
+            border: 2px solid #e1e1e1;
+            border-radius: 16px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .user-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .user-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #374ba7 0%, #010552 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 auto 20px;
+        }
+
+        .user-info {
+            text-align: center;
+        }
+
+        .user-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .user-email {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            word-break: break-word;
+        }
+
+        .user-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #e1e1e1;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .user-id {
+            font-family: monospace;
+            background: #f1f3f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .user-date {
+            font-weight: 500;
+        }
+
+        .navigation {
+            text-align: center;
+            padding: 30px 40px;
+            background: #f8f9fa;
+            border-top: 1px solid #e1e1e1;
+        }
+
+        .nav-btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #374ba7 0%, #010552 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #28a745 0%, #4d9e1a 100%);
+        }
+
+        .refresh-btn:hover {
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            .header,
+            .content,
+            .navigation {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .users-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .stats {
+                gap: 15px;
+            }
+
+            .stat-item {
+                padding: 10px 20px;
+            }
+        }
     </style>
-</head>    
+</head>
+
 <body>
     <div class="container">
         <div class="header">
             <h1> Lista de usuarios registrados</h1>
             <p>Lista completa de usuarios registrados en la aplicación</p>
-        </div>
-        <div>
-            Hola Mundo
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-number" id="totalUsers">-</span>
+                    <div class="stat-label">Total de Usuarios</div>
+                </div>
+            </div>
         </div>
 
+        <div class="content">
+            <div id="loadingState" class="loading">
+                <div class="loading-spinner"></div>
+                <p>Cargando usuarios...</p>
+            </div>
+
+            <div id="errorState" class="error" style="display: none;">
+                <h3>❌ Error al cargar usuarios</h3>
+                <p id="errorMessage">Ha ocurrido un error inesperado.</p>
+            </div>
+
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <h3>No hay usuarios registrados</h3>
+                <p>Aún no se han registrado usuarios en la aplicación.</p>
+            </div>
+
+            <div id="usersContainer" class="users-grid" style="display: none;">
+                <!-- Los usuarios se cargarán aquí dinámicamente -->
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="/" class="nav-btn"> Registrar Nuevo Usuario</a>
+            <button onclick="loadUsers()" class="nav-btn refresh-btn"> Actualizar Lista</button>
+        </div>
     </div>
+
+    <script>
+        // Referencias a elementos del DOM
+        const loadingState = document.getElementById('loadingState');
+        const errorState = document.getElementById('errorState');
+        const emptyState = document.getElementById('emptyState');
+        const usersContainer = document.getElementById('usersContainer');
+        const totalUsersElement = document.getElementById('totalUsers');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Función para formatear fechas
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const options = { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            return date.toLocaleDateString('es-ES', options);
+        }
+
+        // Función para obtener las iniciales de un nombre
+        function getInitials(name) {
+            return name
+                .split(' ')
+                .map(word => word.charAt(0).toUpperCase())
+                .join('')
+                .substring(0, 2);
+        }
+
+        // Función para crear una tarjeta de usuario
+        function createUserCard(user) {
+            const initials = getInitials(user.fullName);
+            const formattedDate = formatDate(user.createdAt);
+            const shortId = user._id.substring(user._id.length - 6);
+
+            return `
+                <div class="user-card">
+                    <div class="user-avatar">${initials}</div>
+                    <div class="user-info">
+                        <div class="user-name">${user.fullName}</div>
+                        <div class="user-email">${user.email}</div>
+                        <div class="user-meta">
+                            <span class="user-id">ID: ${shortId}</span>
+                            <span class="user-date">${formattedDate}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Función para mostrar estado de carga
+        function showLoading() {
+            loadingState.style.display = 'block';
+            errorState.style.display = 'none';
+            emptyState.style.display = 'none';
+            usersContainer.style.display = 'none';
+        }
+
+        // Función para mostrar error
+        function showError(message) {
+            loadingState.style.display = 'none';
+            errorState.style.display = 'block';
+            emptyState.style.display = 'none';
+            usersContainer.style.display = 'none';
+            errorMessage.textContent = message;
+        }
+
+        // Función para mostrar estado vacío
+        function showEmpty() {
+            loadingState.style.display = 'none';
+            errorState.style.display = 'none';
+            emptyState.style.display = 'block';
+            usersContainer.style.display = 'none';
+            totalUsersElement.textContent = '0';
+        }
+
+        // Función para mostrar usuarios
+        function showUsers(users) {
+            loadingState.style.display = 'none';
+            errorState.style.display = 'none';
+            emptyState.style.display = 'none';
+            usersContainer.style.display = 'grid';
+
+            // Actualizar contador de usuarios
+            totalUsersElement.textContent = users.length;
+
+            // Limpiar contenedor y agregar usuarios
+            usersContainer.innerHTML = '';
+            users.forEach(user => {
+                usersContainer.innerHTML += createUserCard(user);
+            });
+
+        }
+
+        // Función principal para cargar usuarios
+        async function loadUsers() {
+            showLoading();
+
+            try {
+                const response = await fetch('/api/users');
+                
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    if (data.users.length === 0) {
+                        showEmpty();
+                    } else {
+                        showUsers(data.users);
+                    }
+                } else {
+                    showError(data.message || 'Error al obtener la lista de usuarios');
+                }
+
+            } catch (error) {
+                console.error('Error al cargar usuarios:', error);
+                
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    showError('Error de conexión. Verifica que el servidor esté funcionando.');
+                } else {
+                    showError('Error al cargar los usuarios. Por favor, intenta de nuevo.');
+                }
+            }
+        }
+
+        // Cargar usuarios al iniciar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUsers();
+        });
+
+        // Manejar errores de red
+        window.addEventListener('online', function() {
+            console.log('Conexión restaurada');
+            loadUsers();
+        });
+
+        window.addEventListener('offline', function() {
+            console.log('Conexión perdida');
+            showError('Sin conexión a internet. Verifica tu conexión de red.');
+        });
+    </script>
 </body>
 </html>
