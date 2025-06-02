@@ -16,25 +16,25 @@ Es un aplicación para registro de usuarios construida en el Frontend con Vanill
 ## Cómo inicializar la app
 
 1. Clonar repositorio:
-    git clone https://github.com/Zagarsix/User-registration-app-with-MongoDB.git
+    $ git clone https://github.com/Zagarsix/User-registration-app-with-MongoDB.git
 
 2. Instalar el paquete npm:
-    npm install
+    $ npm install
 
 3. Iniciar MongoDB (instalado previamente):
     (Desde Command Prompt como administrador)
-    net start MongoDB
+    $ net start MongoDB
 
 4. Inicializar el servidor local:
-    npm start
+    $ npm start
 
 
 ## Se debería ver lo siguiente:
 
-Servidor ejecutándose en http://localhost:3000
-Formulario de registro: http://localhost:3000
-Lista de usuarios: http://localhost:3000/users
-Conexión exitosa a MongoDB
+- Servidor ejecutándose en http://localhost:3000
+- Formulario de registro: http://localhost:3000
+- Lista de usuarios: http://localhost:3000/users
+- Conexión exitosa a MongoDB
 
 
 ## Probando la aplicación:
