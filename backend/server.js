@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const cors = require('cors');
 const path = require('path');
-const { count } = require('console');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -36,7 +35,7 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: [true, 'Este campo es obligatorio'],
-        minlength: [6, 'Este campo debe tener al menos 6 caracteres']
+        minlength: [8, 'Este campo debe tener al menos 8 caracteres']
     }
 }, {
     timestamps: true // Agrega createdAt y updateAt automáticamente
@@ -45,22 +44,48 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 
 // Función de validación personalizada
-const validateUserData = (fullName, email, password) => {
-    const errors = [];
-
-    if (!fullName || fullName.trim().length < 4) {
-        errors.push('El nombre completo debe tener al menos 4 caracteres');
+function validateFullName(name) {
+    const fullNameRegex = /^[a-zA-ZÀ-ú\s]+$/;
+    if (!name || name.trim().length < 4) {
+        return 'El nombre debe tener al menos 4 caracteres';
     }
-    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-    if (!email || !emailRegex.test(email)) {
-        errors.push('El formato del correo electrónico no es válido');
+    if (!fullNameRegex.test(name.trim())) {
+        return 'El nombre solo puede contener letras y espacios';
     }
+    return null;
+}
 
-    if (!password || password.length < 6) {
-        errors.push('La contraseña debe tener al menos 6 caracteres');
+function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+        return 'El correo electrónico es obligatorio';
     }
+    if (!emailRegex.test(email)) {
+        return 'El formato del correo electrónico es inválido';
+    }
+    return null;
+}
 
-    return errors;
+function validatePassword(password) {
+    if (!password) {
+        return 'La contraseña es obligatoria';
+    }
+    if (password.length < 8) {
+        return 'La contraseña debe tener al menos 8 caracteres';
+    }
+    if (!/(?=.*[a-z])/.test(password)) {
+        return 'La contraseña debe contener al menos una letra minúscula';
+    }
+    if (!/(?=.*[A-Z])/.test(password)) {
+        return 'La contraseña debe contener al menos una letra mayúscula';
+    }
+    if (!/(?=.*\d)/.test(password)) {
+        return 'La contraseña debe contener al menos un número';
+    }
+    if (!/(?=.*[#?!@$%^&*-])/.test(password)) {
+        return 'La contraseña debe contener al menos un caracter especial';
+    }
+    return null;
 };
 
 //-- RUTAS -- //
@@ -81,12 +106,22 @@ app.post('/api/register', async (req,res) => {
         const { fullName, email, password } = req.body;
 
         // Validaciones
-        const validationErrors = validateUserData(fullName, email, password);
-        if (validationErrors.length > 0) {
+        const errors = [];
+        
+        const nameError = validateFullName(fullName);
+        if (nameError) errors.push(nameError);
+        
+        const emailError = validateEmail(email);
+        if (emailError) errors.push(emailError);
+        
+        const passwordError = validatePassword(password);
+        if (passwordError) errors.push(passwordError);
+
+        if (errors.length > 0) {
             return res.status(400).json({
                 success: false,
-                message: 'Errores de validación',
-                errors: validationErrors
+                message: 'Datos inválidos',
+                errors: errors
             });
         }
 
@@ -114,7 +149,7 @@ app.post('/api/register', async (req,res) => {
 
         res.status(201).json({
             success: true,
-            message: 'Usuario registrado existosamente',
+            message: 'Usuario registrado exitosamente',
             user: {
                 id: newUser._id,
                 fullName: newUser.fullName,
