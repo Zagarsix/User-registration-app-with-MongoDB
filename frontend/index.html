@@ -5,7 +5,201 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Usuario</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #7cea66 0%, #4358b5 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgb(175, 177, 188);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #7cea66 0%, #afb1bc);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #010552;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #282727;
+            font-size: 1.1rem;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e1e1;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #6171b8;
+            background: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group input.error {
+            border-color: #e74c3c;
+            background: #fdf2f2;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #374ba7 0%, #010552 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #040b2d 0%, #010552 100%);
+            color: #7cb272;
+            box-shadow: 0 8px 25px rgba(205, 63, 63, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+        }
+
+        .submit-btn.loading .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #1c8e18;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            color: #981623;
+            border: 1px solid #f5c6cb;
+        }
+
+        .navigation {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid #e1e1e1;
+        }
+
+        .navigation a {
+            color: #4d9e1a;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .navigation a:hover {
+            color: #1c8e18;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
     </style>
 </head>    
 <body>
@@ -14,28 +208,251 @@
             <h1> Registro</h1>
             <p>¿Eres nuevo? Regístrate y crea tu cuenta</p>
         </div>
+
+        <div id="alert" class="alert"></div>
+
         <form id="registrationForm">
             <div class="form-group">
                 <label for="fullName">Nombre completo</label>
                 <input type="text" id="fullName" name="fullName" required>
-                <div class="error-mesage" id="fullName"></div>
+                <div class="error-message" id="fullNameError"></div>
             </div>
             <div class="form-group">
                 <label for="email">Correo electrónico</label>
-                <input type="text" id="email" name="email" required>
-                <div class="error-mesage" id="emailError"></div>
+                <input type="email" id="email" name="email" required>
+                <div class="error-message" id="emailError"></div>
             </div>
             <div class="form-group">
                 <label for="password">Contraseña</label>
-                <input type="text" id="password" name="password" required>
-                <div class="error-mesage" id="passwordError"></div>
+                <input type="password" id="password" name="password" required>
+                <div class="error-message" id="passwordError"></div>
             </div>
 
-            <button type="submit" class="submit-btn" id="submit-btn">
+            <button type="submit" class="submit-btn" id="submitBtn">
+                <span class="loading"></span>
                 <span class="btn-text">Registrar</span>
             </button>
         </form>
 
+        <div class="navigation">
+            <a href="/users"> Ver usuarios registrados</a>
+        </div>
     </div>
+
+    <script>
+        // Elementos del DOM
+        const form = document.getElementById('registrationForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const alert = document.getElementById('alert');
+        const inputs = {
+            fullName: document.getElementById('fullName'),
+            email: document.getElementById('email'),
+            password: document.getElementById('password')
+        };
+
+        // Funciones de validación
+        function validateFullName(name) {
+            const fullNameRegex = /^[a-zA-ZÀ-ú\s]+$/;
+            if (!name || name.trim().length < 4) {
+                return 'El nombre debe tener al menos 4 caracteres';
+            }
+            if (!fullNameRegex.test(name.trim())) {
+                return 'El nombre solo puede contener letras y espacios';
+            }
+            return null;
+        }
+
+        function validateEmail(email) {
+            const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+            if (!email) {
+                return 'El correo electrónico es obligatorio';
+            }
+            if (!emailRegex.test(email)) {
+                return 'El formato del correo electrónico es inválido';
+            }
+            return null;
+        }
+
+        function validatePassword(password) {
+            if (!password) {
+                return 'La contraseña es obligatoria';
+            }
+            if (password.length < 8) {
+                return 'La contraseña debe tener al menos 8 caracteres';
+            }
+            if (!/(?=.*[a-z])/.test(password)) {
+                return 'La contraseña debe contener al menos una letra minúscula';
+            }
+            if (!/(?=.*[A-Z])/.test(password)) {
+                return 'La contraseña debe contener al menos una letra mayúscula';
+            }
+            if (!/(?=.*\d)/.test(password)) {
+                return 'La contraseña debe contener al menos un número';
+            }
+            if (!/(?=.*[#?!@$%^&*-])/.test(password)) {
+                return 'La contraseña debe contener al menos un caracter especial (#?!@$%^&*-)';
+            }
+            return null;
+        }
+
+        // Función para mostrar errores en los campos
+        function showFieldError(fieldName, message) {
+            const input = inputs[fieldName];
+            const errorElement = document.getElementById(fieldName + 'Error');
+            
+            input.classList.add('error');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        // Función para limpiar errores en los campos
+        function clearFieldError(fieldName) {
+            const input = inputs[fieldName];
+            const errorElement = document.getElementById(fieldName + 'Error');
+            
+            input.classList.remove('error');
+            errorElement.style.display = 'none';
+        }
+
+        // Función para limpiar todos los errores
+        function clearAllErrors() {
+            Object.keys(inputs).forEach(fieldName => {
+                clearFieldError(fieldName);
+            });
+        }
+
+        // Función para mostrar alertas
+        function showAlert(message, type) {
+            alert.className = `alert ${type}`;
+            alert.textContent = message;
+            alert.style.display = 'block';
+            
+            // Auto-ocultar después de 5 segundos
+            if (type === 'success') {
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Validación en tiempo real
+        inputs.fullName.addEventListener('blur', function() {
+            const error = validateFullName(this.value);
+            if (error) {
+                showFieldError('fullName', error);
+            } else {
+                clearFieldError('fullName');
+            }
+        });
+
+        inputs.email.addEventListener('blur', function() {
+            const error = validateEmail(this.value);
+            if (error) {
+                showFieldError('email', error);
+            } else {
+                clearFieldError('email');
+            }
+        });
+
+        inputs.password.addEventListener('blur', function() {
+            const error = validatePassword(this.value);
+            if (error) {
+                showFieldError('password', error);
+            } else {
+                clearFieldError('password');
+            }
+        });
+
+        // Limpiar errores cuando el usuario empiece a escribir
+        Object.keys(inputs).forEach(fieldName => {
+            inputs[fieldName].addEventListener('input', function() {
+                if (this.classList.contains('error')) {
+                    clearFieldError(fieldName);
+                }
+            });
+        });
+
+        // Manejo del envío del formulario
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Limpiar alertas previas
+            alert.style.display = 'none';
+            clearAllErrors();
+            
+            // Obtener valores del formulario
+            const formData = {
+                fullName: inputs.fullName.value.trim(),
+                email: inputs.email.value.trim(),
+                password: inputs.password.value
+            };
+            
+            // Validar todos los campos
+            let hasErrors = false;
+            
+            const fullNameError = validateFullName(formData.fullName);
+            if (fullNameError) {
+                showFieldError('fullName', fullNameError);
+                hasErrors = true;
+            }
+            
+            const emailError = validateEmail(formData.email);
+            if (emailError) {
+                showFieldError('email', emailError);
+                hasErrors = true;
+            }
+            
+            const passwordError = validatePassword(formData.password);
+            if (passwordError) {
+                showFieldError('password', passwordError);
+                hasErrors = true;
+            }
+            
+            if (hasErrors) {
+                showAlert('Por favor, corrige los errores antes de continuar', 'error');
+                return;
+            }
+            
+            // Mostrar estado de carga
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('¡Usuario registrado exitosamente!', 'success');
+                    form.reset();
+                    // Opcional: redirigir después de 2 segundos
+                    setTimeout(() => {
+                        window.location.href = '/users';
+                    }, 2000);
+                } else {
+                    if (data.errors && Array.isArray(data.errors)) {
+                        // Mostrar errores específicos
+                        showAlert(data.errors.join('. '), 'error');
+                    } else {
+                        showAlert(data.message || 'Error al registrar usuario', 'error');
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Error de conexión. Por favor, intenta de nuevo.', 'error');
+            } finally {
+                // Remover estado de carga
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
 </body>
 </html>
