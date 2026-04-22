@@ -10,6 +10,9 @@
     "install-deps": "npm install",
     "setup": "npm install && echo 'Dependencias instaladas. Ejecutar: npm start'"
   },
+  "engines": {
+    "node": ">=14.0.0"
+  },
   "keywords": [
     "nodejs",
     "mongodb",
@@ -21,6 +24,7 @@
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
     "express": "^5.1.0",
     "mongoose": "^8.15.1"
   },
