@@ -1,15 +1,22 @@
-# User-registration-app-with-MongoDB
+# User registration Mini-app
 
-Es un aplicación para registro de usuarios construida en el Frontend con Vanilla Javascript; y en el Backend con Node.js, Express y MongoDB.
+Aplicación fullstack de registro de usuarios con validación en tiempo real y persistencia en base de datos MongoDB.
 
+**Stack Tecnológico:**
+- Frontend: HTML5, CSS3, JavaScript (Vanilla)
+- Backend: Node.js + Express.js
+- Base de datos: MongoDB + Mongoose
+- Seguridad: bcrypt.js para hash de contraseñas
 
 ## Características
 
-- validaciones en el frontend, como en el backend.
-- Base de datos MongoDb que sea crea automáticamente.
-- Interfaz responsive.
-- Prevención de usuarios dupolicados.
-- Encriptación de contraseñas con bcrypt.
+- validación de formularios en tiempo real (cliente y servidor).
+- Cifrado seguro de contraseñas con bcrypt.
+- Mensajes de error personalizados.
+- Diseño responsive y moderno.
+- Prevención de usuarios duplicados.
+- Manejo robusto de errores.
+- Base de datos MongoDb se crea automáticamente.
 - Vista de Lista de usuarios registrados.
 
 
@@ -41,10 +48,7 @@ Es un aplicación para registro de usuarios construida en el Frontend con Vanill
 
 1. Al abrir el navegador, en http://localhost:3000, se puede registrar un usuario con el formulario.
 
-2. Podemos revisar la lista de usuarios en http://localhost:3000/users. Donde aparece el contador de usuarios registrados y una card con su nombre, correo, id y fecha de resgistro.
+2. Podemos revisar la lista de usuarios en http://localhost:3000/users. Donde aparece el contador de usuarios registrados y una card con su nombre, correo, id y fecha de registro.
 
-## Al ejecutar la aplicación:
-
-1. Se conectará a MongoDB (que ya está inicializado).
-
-2. Se creará automáticamente la base de datos "user_registration_db".
+**Link:**
+- [Ver Demo en vivo](https://user-registration-app-with-mongodb.onrender.com/)
